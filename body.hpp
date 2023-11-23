@@ -4,6 +4,8 @@
 
 #include <cmath>
 
+#define G 1.0
+
 /**
  * @class Body
  * @brief A class that represents a physical body in a simulation.
@@ -108,11 +110,25 @@ public:
         radius = newRadius;
     }
 
-    //Calculate the force of gravity with another body
-    double calculateGravityForce(const Body& otherBody) const {
-        //calculate forces between the two bodies
+    //Calculate the force of gravity exerted from another body
+    double* calculateGravityForce(const Body& otherBody) const {
+        //calculate the magnitude of the force between the two bodies
+        double distance = std::sqrt(std::pow(otherBody.getX() - x, 2) + std::pow(otherBody.getY() - y, 2));
+        double force = -1.0*(G * mass * otherBody.getMass()) / std::pow(distance, 2);
 
-        return 0;
+        //calculate the direction of the force between the two bodies
+        //calculate the displacement vector from this body to the other body
+        double* displacementVector = new double[2];
+        displacementVector[0] = x - otherBody.getX();
+        displacementVector[1] = y - otherBody.getY();
+        //normalize the displacement vector
+        double* forceVector = new double[2];
+        forceVector[0] = force * displacementVector[0] / distance;
+        forceVector[1] = force * displacementVector[1] / distance;
+
+        // free up the memory allocated for the displacement vector
+        delete[] displacementVector;
+        return forceVector;
     }
 
     //Check if this body is currently intersecting another body

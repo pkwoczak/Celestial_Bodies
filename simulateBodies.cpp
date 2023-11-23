@@ -1,6 +1,9 @@
 #include <iostream>
+#include <cmath>
+#include <vector>
 #include "body.hpp"
 #include "planet.hpp"
+#include "interactions.hpp"
 
 int main() {
     // Create two Body objects using different constructors
@@ -45,7 +48,63 @@ int main() {
     intersecting = planet1.isIntersecting(planet2);
     std::cout << "\nAre the planets intersecting? " << (intersecting ? "Yes" : "No") << "\n\n";
 
+    //test the gravitational force
+    Planet planet3(0, 0, 0, 0, 0, 0, 1000, 1000);
+    Planet planet4(0, 1000, 0, 0, 0, 0, 1000, 1000);
+    double* force = new double[2];
+    force = planet3.calculateGravityForce(planet4);
+    std::cout << "The mass of planet 3 is " << planet3.getMass() << "\n";
+    std::cout << "The mass of planet 4 is " << planet4.getMass() << "\n";
+    std::cout << "The distance between planet 3 and planet 4 is " << std::sqrt(std::pow(planet3.getX() - planet4.getX(), 2) + std::pow(planet3.getY() - planet4.getY(), 2)) << "\n";
+    std::cout << "The force on planet 3 from planet 4 is: " << force[0] << ", " << force[1] << "\n";
+    delete [] force;
 
+    //create a system of bodies
+    std::vector<Body*> system;
+    system.push_back(&planet3);
+    system.push_back(&planet4);
     
+    //print the system
+    std::cout << "\n\nThe system is: \n";
+    for (int i = 0; i < system.size(); i++) {
+        std::cout << "Body " << i << ": x = " << system[i]->getX() << ", y = " << system[i]->getY() << ", mass = " << system[i]->getMass() << ", radius = " << system[i]->getRadius() << "\n";
+    }
+
+    //conduct the simulation
+    double t_start = 0;
+    double t = t_start;
+    double t_end = 10;
+    double N = 100;
+    double dt = (t_end - t_start) / N;
+
+    for (int i=0; i<N; i++){
+        //reset the acceleration of each body to 0
+        resetAcceleration(system);
+
+        //update the current time
+        t = t + dt;
+
+        //calculate the acceleration of each body
+        for (int j = 0; j < system.size(); j++) {
+            for (int k = j; k < system.size(); k++) {                
+                double* force = new double[2];
+                force = system[j]->calculateGravityForce(*system[k]);
+                
+                //update the acceleration of body j
+                system[j]->setX_acc(system[j]->getX_acc() + force[0] / system[j]->getMass());
+                system[j]->setY_acc(system[j]->getY_acc() + force[1] / system[j]->getMass());
+                //update the acceleration of body k
+                system[k]->setX_acc(system[k]->getX_acc() - force[0] / system[k]->getMass());
+                system[k]->setY_acc(system[k]->getY_acc() - force[1] / system[k]->getMass());
+                
+                delete[] force;
+            }
+        }
+
+        //update the velocity of each body
+ 
+        //update the position of each body
+    }
+
     return 0;
 }

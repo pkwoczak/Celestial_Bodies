@@ -74,7 +74,7 @@ int main() {
     double t_start = 0;
     double t = t_start;
     double t_end = 10;
-    double N = 100;
+    double N = 500;
     double dt = (t_end - t_start) / N;
 
     for (int i=0; i<N; i++){
@@ -105,6 +105,19 @@ int main() {
  
         //update the position of each body
     }
-
+    //Testing:
+    //create vector of vectors to store the positions and radius of the planets with time
+    //positions1 is the vector of vectors for, say, planet 1
+    std::vector<std::vector<double> > positions1;
+    for(int i = 0; i < N; i++){
+        std::vector<double> row;
+        row.push_back(3*std::cos(i*dt)); //x
+        row.push_back(std::sin(3*i*dt)); //y
+        row.push_back(5.0); //radius
+        positions1.push_back(row);
+    }
+    //save positions your planet to a csv file
+    saveCoordinates(positions1, "planet1_coordinates.csv");
+    
     return 0;
 }

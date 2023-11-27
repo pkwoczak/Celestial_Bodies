@@ -4,6 +4,7 @@
 #include "body.hpp"
 #include "planet.hpp"
 #include "interactions.hpp"
+#include "save_coords.hpp"
 
 int main() {
     // Create two Body objects using different constructors

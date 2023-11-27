@@ -6,7 +6,8 @@
 #include <vector>
 #include "body.hpp"
 
-std::vector<std::vector> compute(std::vector<body> &bodies, double timeStep, double endTime);
+std::vector<std::vector<double> > compute(std::vector<Body> &bodies, double timeStep, double endTime){
+std::cout << "Computing trajectory...\n";
 // number of bodies
 size_t n = bodies.size();
 // dimensions of the bodies 
@@ -16,7 +17,7 @@ size_t dim = 2;
 size_t nsteps = endTime / timeStep;
 // record the trajectory(with time) of the bodies
 // trajectory has nsteps vectors, each vector has n*dim elements
-std::vector<std::vector<double>> trajectory(nsteps, std::vector<double>(n * dim + 1));
+std::vector<std::vector<double> > trajectory(nsteps, std::vector<double>(n * dim + 1));
 // initialize the trajectory based on the initial positions
 for (size_t i = 0; i < n; i++) {
     trajectory[0][i * dim] = bodies[i].getX();
@@ -36,6 +37,7 @@ for (size_t i = 0; i < n; i++) {
     accelerations[i * dim] = bodies[i].getX_acc();
     accelerations[i * dim + 1] = bodies[i].getY_acc();
 }
+std::cout << "Initialized positions, velocities, and accelerations\n";
 // loop over the timesteps
 // new position = position + velocity * timestep + 0.5 * acceleration * timestep^2
 // update the accelerations using the new positions by newton's law of gravitation
@@ -43,7 +45,7 @@ for (size_t i = 0; i < n; i++) {
 // initialize the vector of new accelerations
 std::vector<double> newAccelerations(n * dim);
 // new velocity = velocity + (acceleration + new accerleration) * timestep *0.5
-for (size_t i = 0; i < nsteps; i++) {
+for (size_t i = 0; i < nsteps-1; i++) {
     // update the positions
     for (size_t j = 0; j < n; j++) {
         positions[j * dim] += velocities[j * dim] * timeStep + 0.5 * accelerations[j * dim] * timeStep * timeStep;
@@ -79,7 +81,9 @@ for (size_t i = 0; i < nsteps; i++) {
         trajectory[i + 1][j * dim] = positions[j * dim];
         trajectory[i + 1][j * dim + 1] = positions[j * dim + 1];
     }
+    
 }
+std::cout << "Updated trajectory\n";
 
 // update the bodies
 for (size_t i = 0; i < n; i++) {
@@ -90,7 +94,9 @@ for (size_t i = 0; i < n; i++) {
     bodies[i].setX_acc(accelerations[i * dim]);
     bodies[i].setY_acc(accelerations[i * dim + 1]);
 }
+std::cout << "Updated bodies\n";
 
 return trajectory;
+}
 
 #endif

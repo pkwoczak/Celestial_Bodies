@@ -5,6 +5,7 @@
 #include "planet.hpp"
 #include "interactions.hpp"
 #include "save_coords.hpp"
+#include "compute.hpp"
 
 int main() {
     // Create two Body objects using different constructors
@@ -74,51 +75,45 @@ int main() {
     //conduct the simulation
     double t_start = 0;
     double t = t_start;
-    double t_end = 10;
+    double t_end = 20;
     double N = 500;
     double dt = (t_end - t_start) / N;
 
-    for (int i=0; i<N; i++){
-        //reset the acceleration of each body to 0
-        resetAcceleration(system);
+    //set masses and radii for the bodies
+    body1.setMass(3.0);
+    body1.setRadius(1.0);
+    body1.setX(0.3);
+    body1.setY(0);
+    body1.setX_vel(0);
+    body1.setY_vel(-1);
+    body2.setMass(3.0);
+    body2.setRadius(1.0);
+    body2.setX(-0.3);
+    body2.setY(0);
+    body2.setX_vel(0);
+    body2.setY_vel(-5);
 
-        //update the current time
-        t = t + dt;
+    std::vector<Body> bodies = {body1, body2};
+    std::cout << "created bodies" << std::endl;
+    //calculate the trajectory of each body here 
+    // Calculate the trajectories using the 'compute' function from compute.hpp
+    std::vector<std::vector<double>> trajectories = compute(bodies, dt, t_end);
 
-        //calculate the acceleration of each body
-        for (int j = 0; j < system.size(); j++) {
-            for (int k = j; k < system.size(); k++) {                
-                double* force = new double[2];
-                force = system[j]->calculateGravityForce(*system[k]);
-                
-                //update the acceleration of body j
-                system[j]->setX_acc(system[j]->getX_acc() + force[0] / system[j]->getMass());
-                system[j]->setY_acc(system[j]->getY_acc() + force[1] / system[j]->getMass());
-                //update the acceleration of body k
-                system[k]->setX_acc(system[k]->getX_acc() - force[0] / system[k]->getMass());
-                system[k]->setY_acc(system[k]->getY_acc() - force[1] / system[k]->getMass());
-                
-                delete[] force;
-            }
-        }
+    // Transform the computed trajectories into position vectors with time and radius for each body
+    std::vector<std::vector<double>> positions_body1, positions_body2;
 
-        //update the velocity of each body
- 
-        //update the position of each body
+    for (const auto& step : trajectories) {
+        std::vector<double> pos1 = {step[0], step[1], bodies[0].getRadius()};
+        std::vector<double> pos2 = {step[2], step[3], bodies[1].getRadius()};
+        positions_body1.push_back(pos1);
+        positions_body2.push_back(pos2);
     }
-    //Testing:
-    //create vector of vectors to store the positions and radius of the planets with time
-    //positions1 is the vector of vectors for, say, planet 1
-    std::vector<std::vector<double> > positions1;
-    for(int i = 0; i < N; i++){
-        std::vector<double> row;
-        row.push_back(3*std::cos(i*dt)); //x
-        row.push_back(std::sin(3*i*dt)); //y
-        row.push_back(5.0); //radius
-        positions1.push_back(row);
-    }
-    //save positions your planet to a csv file
-    saveCoordinates(positions1, "planet1_coordinates.csv");
+    std::cout << "calculated trajectories" << std::endl;
+
+    // Save the positions of each body to separate CSV files
+    saveCoordinates(positions_body1, "coords/body1_coordinates.csv");
+    saveCoordinates(positions_body2, "coords/body2_coordinates.csv");
     
+    // (Finish updating)
     return 0;
 }

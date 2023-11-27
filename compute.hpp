@@ -6,7 +6,7 @@
 #include <vector>
 #include "body.hpp"
 
-void compute(std::vector<body> &bodies, double timeStep, double endTime);
+std::vector<std::vector> compute(std::vector<body> &bodies, double timeStep, double endTime);
 // number of bodies
 size_t n = bodies.size();
 // dimensions of the bodies 
@@ -14,6 +14,14 @@ size_t n = bodies.size();
 size_t dim = 2;
 // number of timesteps
 size_t nsteps = endTime / timeStep;
+// record the trajectory(with time) of the bodies
+// trajectory has nsteps vectors, each vector has n*dim elements
+std::vector<std::vector<double>> trajectory(nsteps, std::vector<double>(n * dim + 1));
+// initialize the trajectory based on the initial positions
+for (size_t i = 0; i < n; i++) {
+    trajectory[0][i * dim] = bodies[i].getX();
+    trajectory[0][i * dim + 1] = bodies[i].getY();
+}
 // initialize the positions, velocities, and accelerations
 // size of the vectors is the number of bodies * the number of dimensions
 std::vector<double> positions(n * dim);
@@ -66,6 +74,11 @@ for (size_t i = 0; i < nsteps; i++) {
         accelerations[j * dim] = newAccelerations[j * dim];
         accelerations[j * dim + 1] = newAccelerations[j * dim + 1];
     }
+    // update the trajectory
+    for (size_t j = 0; j < n; j++) {
+        trajectory[i + 1][j * dim] = positions[j * dim];
+        trajectory[i + 1][j * dim + 1] = positions[j * dim + 1];
+    }
 }
 
 // update the bodies
@@ -77,5 +90,7 @@ for (size_t i = 0; i < n; i++) {
     bodies[i].setX_acc(accelerations[i * dim]);
     bodies[i].setY_acc(accelerations[i * dim + 1]);
 }
+
+return trajectory;
 
 #endif

@@ -70,14 +70,8 @@ std::vector<std::vector<double>> RK4(std::vector<Body> &bodies, double timeStep,
     std::vector<std::vector<double>> trajectory(numSteps+1, std::vector<double>(n*dim, 0));
     // initialize trajectory
     for (size_t i = 0; i < n; i++){
-        for (size_t j = 0; j < dim; j++){
-            // Need to change body.hpp
-            // current version uses getX() and getY() to get position
-            // getX_vel() and getY_vel() to get velocity
-            // getX_acc() and getY_acc() to get acceleration
-            trajectory[0][i*dim + j] = bodies[i].getX();
-            trajectory[0][i*dim + j + n*dim] = bodies[i].getX_vel();
-        }
+        trajectory[0][i*dim] = bodies[i].getX();
+        trajectory[0][i*dim + 1] = bodies[i].getY();
     }
     // iterate over time steps
     // use one_iter to compute f(x, t)

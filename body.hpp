@@ -1,7 +1,10 @@
+
 #ifndef BODY_HPP
 #define BODY_HPP
 
 #include <cmath>
+#include <iostream>
+using namespace std;
 
 #define G 1.0
 
@@ -9,7 +12,7 @@
  * @class Body
  * @brief A class that represents a physical body in a simulation.
  *
- * This class contains properties such as position, velocity, mass, and radius,
+ * This class contains properties such as position, velocity, acceleration, mass, and radius,
  * and methods to calculate gravity force, check intersection with another body, absorb another body,
  * and calculate elastic collision with another body. Mass and Radius are enforced to be positive.
  */
@@ -35,7 +38,7 @@ public:
                 std::cout << "Warning: Input mass is non-positive. Setting mass to 1." << std::endl;
                 this->mass = 1;
             }
-            if (radius <= 0) {
+            if (radius <= 0 && radius != -1) {
                 std::cout << "Warning: Input radius is non-positive. Setting radius to 1." << std::endl;
                 this->radius = 1;
             }
@@ -91,10 +94,15 @@ public:
         radius = newRadius;
     }
 
+    //Calculate the distance between this body and another body
+    double calculateDistance(const Body& otherBody) const {
+        return std::sqrt(std::pow(otherBody.getX() - x, 2) + std::pow(otherBody.getY() - y, 2));
+    }
+
     //Calculate the force of gravity exerted from another body
     double* calculateGravityForce(const Body& otherBody) const {
         //calculate the magnitude of the force between the two bodies
-        double distance = std::sqrt(std::pow(otherBody.getX() - x, 2) + std::pow(otherBody.getY() - y, 2));
+        double distance = calculateDistance(otherBody);
         double force = -1.0*(G * mass * otherBody.getMass()) / std::pow(distance, 2);
 
         //calculate the direction of the force between the two bodies
@@ -132,12 +140,6 @@ public:
         // erase the other body, setting its mass and radius to 0
         otherBody.setMass(0);
         otherBody.setRadius(0);
-    }
-
-    //Calculate elastic collision with another body
-    //ignore for now
-    void calculateElasticCollision(Body& otherBody) {
-    //implement elastic collision
     }
 };
 

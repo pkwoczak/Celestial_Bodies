@@ -113,6 +113,14 @@ for (size_t i = 0; i < nsteps; i++) {
         trajectory[i + 1][j][1] = positions[j * dim + 1];
         trajectory[i + 1][j][2] = bodies[j].getRadius();
     }
+    // updated bodies
+    // iterate over good_indices
+    for (size_t j = 0; j < good_indices.size(); j++) {
+        bodies[good_indices[j]].setX(positions[good_indices[j] * dim]);
+        bodies[good_indices[j]].setY(positions[good_indices[j] * dim + 1]);
+        bodies[good_indices[j]].setX_vel(velocities[good_indices[j] * dim]);
+        bodies[good_indices[j]].setY_vel(velocities[good_indices[j] * dim + 1]);
+    }
     // update the good_indices vector if there is a collision
     // since collision is rare, we can brute force it by checking every pair of bodies
     // ignore the efficiency for now

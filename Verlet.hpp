@@ -82,8 +82,9 @@ for (size_t i = 0; i < nsteps; i++) {
     // not break out of the loop if there is a collision, just set collision to true
     for (size_t j = 0; j < good_indices.size(); j++) {
         for (size_t k = j+1; k < good_indices.size(); k++) {
-            double distance = sqrt(pow(positions[good_indices[j] * dim] - positions[good_indices[k] * dim], 2) + pow(positions[good_indices[j] * dim + 1] - positions[good_indices[k] * dim + 1], 2));
-            if (distance <= (bodies[good_indices[j]].getRadius() + bodies[good_indices[k]].getRadius())) {
+            // compute distance between body j and body k by distance formula in body.hpp
+            double distance = bodies[good_indices[j]].calculateDistance(bodies[good_indices[k]]);
+            if (bodies[good_indices[j]].isIntersecting(bodies[good_indices[k]], distance)){
                 collision = true;
             }
             double d = pow(distance, 3);
@@ -123,8 +124,7 @@ for (size_t i = 0; i < nsteps; i++) {
         // after absorbing, start the loop again
         for (size_t j = 0; j < good_indices.size(); j++){
             for (size_t k = j+1; k < good_indices.size(); k++){
-                double distance = sqrt(pow(trajectory[i+1][good_indices[j]][0] - trajectory[i+1][good_indices[k]][0], 2) + pow(trajectory[i+1][good_indices[j]][1] - trajectory[i+1][good_indices[k]][1], 2));
-                if (distance <= (bodies[good_indices[j]].getRadius() + bodies[good_indices[k]].getRadius())){
+                if (bodies[good_indices[j]].isIntersecting(bodies[good_indices[k]])){
                     if (bodies[good_indices[j]].getRadius() > bodies[good_indices[k]].getRadius()){
                         bodies[good_indices[j]].absorb(bodies[good_indices[k]]);
                         // erase the smaller body
@@ -164,7 +164,6 @@ for (size_t i = 0; i < nsteps; i++) {
             }
         }
     }
-    
     return trajectory;
 }
 

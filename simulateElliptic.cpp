@@ -58,6 +58,20 @@ int main() {
     }
     std::cout << "calculated trajectories" << std::endl;
 
+    double max_dist = 0.0;
+    double min_dist = 1000000;
+    for (size_t i=0; i<N; i++){
+        double dist = sqrt(pow(positions_star1[i][0] - positions_planet1[i][0], 2) + pow(positions_star1[i][1] - positions_planet1[i][1], 2));
+        if (dist > max_dist){
+            max_dist = dist;
+        }
+        if (dist < min_dist){
+            min_dist = dist;
+        }
+    }
+    std::cout << "Maximum distance between the star and the planet: " << max_dist << std::endl;
+    std::cout << "Minimum distance between the star and the planet: " << min_dist << std::endl;
+
     // Save the positions of each body to separate CSV files
     saveCoordinates(positions_star1, "coords/star1_coordinates.csv");
     saveCoordinates(positions_planet1, "coords/planet1_coordinates.csv");

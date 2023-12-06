@@ -10,8 +10,8 @@
 
 int main() {
     // Create two Body objects using different constructors
-    Star star1(0.0, 0.0, 0.0, -5.0, 1000.0, 100.0);
-    Star star2(100.0, 0.0, 0.0, 5.0, 1000.0, 100.0);
+    Star star1(0.0, 0.0, 0.0, -3.0, 10000.0, 100.0);
+    Star star2(250.0, 0.0, 0.0, 3.0, 10000.0, 100.0);
 
     // Print initial states
     std::cout << "Initial states:\n";
@@ -26,8 +26,8 @@ int main() {
     //conduct the simulation
     double t_start = 0;
     double t = t_start;
-    double t_end = 100;
-    double N = 500;
+    double t_end = 200;
+    double N = 800;
     double dt = (t_end - t_start) / N;
 
     // create a system of bodies
@@ -40,7 +40,7 @@ int main() {
     std::vector<std::vector<double>> trajectories = compute(bodies, dt, t_end);
 
     // Transform the computed trajectories into position vectors with time and radius for each body
-    std::vector<std::vector<double>> positions_star1, positions_planet1;
+    std::vector<std::vector<double>> positions_star1, positions_star2;
 
     for (const auto& step : trajectories) {
         std::vector<double> pos1;
@@ -54,13 +54,13 @@ int main() {
         pos2.push_back(bodies[1].getRadius());
 
         positions_star1.push_back(pos1);
-        positions_planet1.push_back(pos2);
+        positions_star2.push_back(pos2);
     }
     std::cout << "calculated trajectories" << std::endl;
 
     // Save the positions of each body to separate CSV files
     saveCoordinates(positions_star1, "coords/star1_coordinates.csv");
-    saveCoordinates(positions_planet1, "coords/star2_coordinates.csv");
+    saveCoordinates(positions_star2, "coords/star2_coordinates.csv");
     
     // (Finish updating)
     return 0;

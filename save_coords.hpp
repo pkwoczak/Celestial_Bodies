@@ -11,9 +11,6 @@ struct Point {
     double x, y;
 };
 
-void saveCoordinates(const std::vector<std::vector<double>>& positions, const std::string& filename);
-
-
 void saveCoordinates(const std::vector<std::vector<double>>& positions, const std::string& filename) {
     // Open a file for writing
     std::ofstream outputFile(filename);

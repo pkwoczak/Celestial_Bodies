@@ -122,13 +122,10 @@ public:
 
     //Check if this body is currently intersecting another body
     bool isIntersecting(const Body& otherBody) const {
-        double distance = std::sqrt(std::pow(otherBody.getX() - x, 2) + std::pow(otherBody.getY() - y, 2));
+        double distance = calculateDistance(otherBody);
         return distance <= (radius + otherBody.getRadius());
     }
-    // overload the isIntersecting function if distance is given
-    bool isIntersecting(const Body& otherBody, double distance) const {
-        return distance <= (radius + otherBody.getRadius());
-    }
+
     //Absorb another body into this body
     void absorb(Body& otherBody) {
         //implement absorption with another body

@@ -67,7 +67,7 @@ std::vector<std::vector<double>> RK4(std::vector<Body> &bodies, double timeStep,
     // number of time steps
     size_t numSteps = endTime/timeStep;
     // store trajectory of each body with n*dim columns and numSteps+1 rows
-    std::vector<std::vector<double>> trajectory(numSteps+1, std::vector<double>(n*dim, 0));
+    std::vector<std::vector<double>> trajectory(numSteps+1, std::vector<double>(2*n*dim, 0));
     // initialize trajectory size 2*n*dim
     // first n*dim elements are positions
     // last n*dim elements are velocities

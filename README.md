@@ -13,3 +13,5 @@ And then, you run the plot_all_trajectories.py python script:
 python3 plot_trajectory.py 
 
 Within this python script, you can adjust the size of the objects included in the simulation by changing the scalar on lines 45-46.
+
+For the code that takes **collisions** into careful consideration, check the "COLLISIONS" subfolder.

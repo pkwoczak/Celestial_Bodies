@@ -3,7 +3,7 @@ All files that are consistent with the feature allowing inelastic collisions.
 You can run the simulateCollision.cpp to re-create a collision betweem a planet and an asteroid. You can change the setup of the bodies included within the main function.
 
 So, first you run the cpp file:
-g++ -std=c++11 -o test simulateBodies_Verlet.cpp
+g++ -std=c++11 -o test simulateCollision.cpp
 
 You run the executable:
 ./test

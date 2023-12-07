@@ -30,7 +30,7 @@ def update(frame, *args):
     # Update each planet's position and size
     for planet, coordinates in zip(planets, data):
         planet.set_data(coordinates[frame][0], coordinates[frame][1])
-        planet.set_markersize(2 * coordinates[frame][2])
+        planet.set_markersize(15 * coordinates[frame][2])
     return planets
 
 def main():
@@ -61,7 +61,7 @@ def main():
                                   interval=50, blit=True)
 
     # Save the animation as a GIF
-    ani.save('trajectory_animation_06.gif', writer='imagemagick')
+    ani.save('trajectory_animation_05.gif', writer='imagemagick')
 
     # Display the plot
     plt.show()

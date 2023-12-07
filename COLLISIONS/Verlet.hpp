@@ -22,6 +22,7 @@ std::vector<std::vector<std::vector<double> > > verlet(std::vector<Body> &bodies
     size_t dim = 2;
     // number of timesteps
     size_t nsteps = endTime / timeStep;
+
     // initialize the trajectory to be returned
     // trajectory has nsteps+1 vectors, each vector has n elements, each element has 3 elements
     std::vector<std::vector<std::vector<double> > > trajectory(nsteps+1, std::vector<std::vector<double> >(n, std::vector<double>(3)));
@@ -31,6 +32,7 @@ std::vector<std::vector<std::vector<double> > > verlet(std::vector<Body> &bodies
         trajectory[0][i][1] = bodies[i].getY();
         trajectory[0][i][2] = bodies[i].getRadius();
     }
+    
     // initialize the positions, velocities, and accelerations
     // size of the vectors is the number of bodies * the number of dimensions
     std::vector<double> positions(n * dim);
@@ -43,10 +45,11 @@ std::vector<std::vector<std::vector<double> > > verlet(std::vector<Body> &bodies
         velocities[i * dim] = bodies[i].getX_vel();
         velocities[i * dim + 1] = bodies[i].getY_vel();
     }
+    
     // initialize the accelerations to by newton's law of gravitation
     for (size_t i = 0; i < n; i++) {
         for (size_t j = i+1; j < n; j++) {
-            double distance = sqrt(pow(positions[i * dim] - positions[j * dim], 2) + pow(positions[i * dim + 1] - positions[j * dim + 1], 2));
+            double distance = bodies[i].calculateDistance(bodies[j]);
             double d = pow(distance, 3);
             accelerations[i * dim] += G * bodies[j].getMass() * (positions[j * dim] - positions[i * dim]) / d;
             accelerations[i * dim + 1] += G * bodies[j].getMass() * (positions[j * dim + 1] - positions[i * dim + 1]) / d;
@@ -54,6 +57,7 @@ std::vector<std::vector<std::vector<double> > > verlet(std::vector<Body> &bodies
             accelerations[j * dim + 1] += G * bodies[i].getMass() * (positions[i * dim + 1] - positions[j * dim + 1]) / d;
         }
     }
+
     // initialize the vector of new accelerations
     std::vector<double> newAccelerations(n * dim);
     // initialize the good_indices vector
@@ -61,6 +65,7 @@ std::vector<std::vector<std::vector<double> > > verlet(std::vector<Body> &bodies
     for (size_t i = 0; i < n; i++){
         good_indices[i] = i;
     }
+    
     // loop over the timesteps 
     // bool variable to check if there is any collision
     bool collision = false;
@@ -69,8 +74,11 @@ std::vector<std::vector<std::vector<double> > > verlet(std::vector<Body> &bodies
         // iterate over good_indices
         for (size_t j = 0; j < good_indices.size(); j++){
             positions[good_indices[j] * dim] += velocities[good_indices[j] * dim] * timeStep + 0.5 * accelerations[good_indices[j] * dim] * timeStep * timeStep;
+            bodies[good_indices[j]].setX(positions[good_indices[j] * dim]);
             positions[good_indices[j] * dim + 1] += velocities[good_indices[j] * dim + 1] * timeStep + 0.5 * accelerations[good_indices[j] * dim + 1] * timeStep * timeStep;
+            bodies[good_indices[j]].setY(positions[good_indices[j] * dim + 1]);
         }
+
         // updated bodies
         // iterate over good_indices
         for (size_t j = 0; j < good_indices.size(); j++) {
@@ -79,12 +87,14 @@ std::vector<std::vector<std::vector<double> > > verlet(std::vector<Body> &bodies
             bodies[good_indices[j]].setX_vel(velocities[good_indices[j] * dim]);
             bodies[good_indices[j]].setY_vel(velocities[good_indices[j] * dim + 1]);
         }
+
         // update the accelerations
         // initialize the new accelerations to 0
         for (size_t j = 0; j < n; j++) {
             newAccelerations[j * dim] = 0;
             newAccelerations[j * dim + 1] = 0;
         }
+        
         // iterate over good_indices
         // and check if there is any collision after finding the distance
         // not break out of the loop if there is a collision, just set collision to true
@@ -92,7 +102,7 @@ std::vector<std::vector<std::vector<double> > > verlet(std::vector<Body> &bodies
             for (size_t k = j+1; k < good_indices.size(); k++) {
                 // compute distance between body j and body k by distance formula in body.hpp
                 double distance = bodies[good_indices[j]].calculateDistance(bodies[good_indices[k]]);
-                if (bodies[good_indices[j]].isIntersecting(bodies[good_indices[k]], distance)){
+                if (bodies[good_indices[j]].isIntersecting(bodies[good_indices[k]])){
                     collision = true;
                 }
                 double d = pow(distance, 3);
@@ -102,18 +112,21 @@ std::vector<std::vector<std::vector<double> > > verlet(std::vector<Body> &bodies
                 newAccelerations[good_indices[k] * dim + 1] += G * bodies[good_indices[j]].getMass() * (positions[good_indices[j] * dim + 1] - positions[good_indices[k] * dim + 1]) / d;
             }
         }
+
         // update the velocities
         // iterate over good_indices
         for (size_t j = 0; j < good_indices.size(); j++) {
             velocities[good_indices[j] * dim] += 0.5 * (accelerations[good_indices[j] * dim] + newAccelerations[good_indices[j] * dim]) * timeStep;
             velocities[good_indices[j] * dim + 1] += 0.5 * (accelerations[good_indices[j] * dim + 1] + newAccelerations[good_indices[j] * dim + 1]) * timeStep;
         }
+        
         // update the accelerations
         // iterate over good_indices
         for (size_t j = 0; j < good_indices.size(); j++) {
             accelerations[good_indices[j] * dim] = newAccelerations[good_indices[j] * dim];
             accelerations[good_indices[j] * dim + 1] = newAccelerations[good_indices[j] * dim + 1];
         }
+        
         // update the trajectory
         // iterate over every body
         for (size_t j = 0; j < n; j++) {
@@ -154,6 +167,7 @@ std::vector<std::vector<std::vector<double> > > verlet(std::vector<Body> &bodies
                     break;
                 }
             }
+
             // reinitialize the velocities, accelerations
             // size remains the same, just reinitialize the values for the good_indices
             // updated the velocities by bodies
@@ -161,10 +175,11 @@ std::vector<std::vector<std::vector<double> > > verlet(std::vector<Body> &bodies
                 velocities[good_indices[j] * dim] = bodies[good_indices[j]].getX_vel();
                 velocities[good_indices[j] * dim + 1] = bodies[good_indices[j]].getY_vel();
             }
+            
             // initialize the accelerations to by newton's law of gravitation
             for (size_t j = 0; j < good_indices.size(); j++) {
                 for (size_t k = j+1; k < good_indices.size(); k++) {
-                    double distance = sqrt(pow(trajectory[i+1][good_indices[j]][0] - trajectory[i+1][good_indices[k]][0], 2) + pow(trajectory[i+1][good_indices[j]][1] - trajectory[i+1][good_indices[k]][1], 2));
+                    double distance = bodies[good_indices[j]].calculateDistance(bodies[good_indices[k]]);
                     double d = pow(distance, 3);
                     accelerations[good_indices[j] * dim] += G * bodies[good_indices[k]].getMass() * (trajectory[i+1][good_indices[k]][0] - trajectory[i+1][good_indices[j]][0]) / d;
                     accelerations[good_indices[j] * dim + 1] += G * bodies[good_indices[k]].getMass() * (trajectory[i+1][good_indices[k]][1] - trajectory[i+1][good_indices[j]][1]) / d;
@@ -173,8 +188,8 @@ std::vector<std::vector<std::vector<double> > > verlet(std::vector<Body> &bodies
                 }
             }
         }
-        return trajectory;
     }
+    return trajectory;
 }
 
 #endif // VERLET_HPP 

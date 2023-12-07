@@ -68,10 +68,14 @@ std::vector<std::vector<double>> RK4(std::vector<Body> &bodies, double timeStep,
     size_t numSteps = endTime/timeStep;
     // store trajectory of each body with n*dim columns and numSteps+1 rows
     std::vector<std::vector<double>> trajectory(numSteps+1, std::vector<double>(n*dim, 0));
-    // initialize trajectory only contains positions of bodies
+    // initialize trajectory size 2*n*dim
+    // first n*dim elements are positions
+    // last n*dim elements are velocities
     for (size_t i = 0; i < n; i++){
         trajectory[0][i*dim] = bodies[i].getX();
         trajectory[0][i*dim + 1] = bodies[i].getY();
+        trajectory[0][i*dim + n*dim] = bodies[i].getX_vel();
+        trajectory[0][i*dim + n*dim + 1] = bodies[i].getY_vel();
     }
     // initialize masses
     std::vector<double> masses(n, 0);
@@ -112,11 +116,10 @@ std::vector<std::vector<double>> RK4(std::vector<Body> &bodies, double timeStep,
     // also set Y and Y_vel of each body
     for (size_t i = 0; i < n; i++){
         bodies[i].setX(trajectory[numSteps][i*dim]);
-        bodies[i].setX_vel(trajectory[numSteps][i*dim + n*dim]);
         bodies[i].setY(trajectory[numSteps][i*dim + 1]);
+        bodies[i].setX_vel(trajectory[numSteps][i*dim + n*dim]);
         bodies[i].setY_vel(trajectory[numSteps][i*dim + n*dim + 1]);
     }
-
     return trajectory;
 }
 

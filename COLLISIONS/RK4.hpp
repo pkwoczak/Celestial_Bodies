@@ -38,11 +38,7 @@ std::vector<double> one_iter(std::vector<double> &x, size_t n, size_t dim, std::
     for (size_t i = 0; i < n; i++){
         for (size_t j = i+1; j < n; j++){
             // compute distance between body i and body j
-            double dist = 0;
-            for (size_t k = 0; k < dim; k++){
-                dist += pow(x[i*dim + k] - x[j*dim + k], 2);
-            }
-            dist = sqrt(dist);
+            double dist =  sqrt((x[i*dim] - x[j*dim])*(x[i*dim] - x[j*dim]) + (x[i*dim + 1] - x[j*dim + 1])*(x[i*dim + 1] - x[j*dim + 1]));
             // compute acceleration of body i and body j
             double acc = G/(dist*dist*dist);
             // update acceleration of body i 

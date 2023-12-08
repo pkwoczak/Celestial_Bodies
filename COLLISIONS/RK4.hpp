@@ -47,11 +47,11 @@ std::vector<double> one_iter(std::vector<double> &x, size_t n, size_t dim, std::
             double acc = G/(dist*dist*dist);
             // update acceleration of body i 
             for (size_t k = 0; k < dim; k++){
-                f[i*dim + n*dim + k] += acc*masses[j]*x[j*dim + k];
+                f[i*dim + n*dim + k] += acc*masses[j]*(x[j*dim + k] - x[i*dim + k]);
             }
             // update acceleration of body j
             for (size_t k = 0; k < dim; k++){
-                f[j*dim + n*dim + k] -= acc*masses[i]*x[i*dim + k];
+                f[j*dim + n*dim + k] -= acc*masses[i]*(x[j*dim + k] - x[i*dim + k]);
             }
         }
     }

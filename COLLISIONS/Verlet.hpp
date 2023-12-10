@@ -174,6 +174,8 @@ std::vector<std::vector<std::vector<double> > > verlet(std::vector<Body> &bodies
             for (size_t j = 0; j < good_indices.size(); j++) {
                 velocities[good_indices[j] * dim] = bodies[good_indices[j]].getX_vel();
                 velocities[good_indices[j] * dim + 1] = bodies[good_indices[j]].getY_vel();
+                accelerations[good_indices[j] * dim] = 0;
+                accelerations[good_indices[j] * dim + 1] = 0;
             }
             
             // initialize the accelerations to by newton's law of gravitation

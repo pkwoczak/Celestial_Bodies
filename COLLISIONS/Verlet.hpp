@@ -167,7 +167,10 @@ std::vector<std::vector<std::vector<double> > > verlet(std::vector<Body> &bodies
                     break;
                 }
             }
-
+            // restart the loop if there is a collision
+            if (collision){
+                continue;
+            }
             // reinitialize the velocities, accelerations
             // size remains the same, just reinitialize the values for the good_indices
             // updated the velocities by bodies

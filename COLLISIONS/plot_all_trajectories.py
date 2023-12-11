@@ -30,12 +30,14 @@ def update(frame, *args):
     # Update each planet's position and size
     for planet, coordinates in zip(planets, data):
         planet.set_data(coordinates[frame][0], coordinates[frame][1])
-        planet.set_markersize(15 * coordinates[frame][2])
+        planet.set_markersize(coordinates[frame][2])
     return planets
+
+
 
 def main():
     # Set the working directory
-    os.chdir('/Users/giorgoskementzidis/Library/CloudStorage/OneDrive-Personal/repos/ams_562/Celestial_Bodies/')
+    os.chdir('/Users/patrykkwoczak/Graduate School/AMS562/project/collisions')
     directory = 'coords'
 
     # Read all coordinates from the CSV files in the directory
@@ -53,7 +55,10 @@ def main():
     ax.set_ylim(min_y, max_y)
 
     # Create a plot object for each set of coordinates
-    planets = [ax.plot([], [], 'o', markersize=2 * coords[0][2])[0] for coords in coordinates]
+
+    
+
+    planets = [ax.plot([], [], 'o', markersize = coords[0][2])[0] for coords in coordinates]
 
     # Create an animation with the update function and the coordinates
     ani = animation.FuncAnimation(fig, update, frames=min(len(coords) for coords in coordinates),

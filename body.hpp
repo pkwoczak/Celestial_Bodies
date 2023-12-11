@@ -3,6 +3,8 @@
 #define BODY_HPP
 
 #include <cmath>
+#include <iostream>
+using namespace std;
 
 #define G 1.0
 
@@ -20,25 +22,23 @@ private:
     double y;       // y center coordinate
     double x_vel;   // velocity in the x direction
     double y_vel;   // velocity in the y direction
-    double x_acc;   // acceleration in the x direction
-    double y_acc;   // acceleration in the y direction
     double mass;    // mass of the body
     double radius;   // radius of the body
 
 public:
     //Default constructor
     Body()
-        : x(0), y(0), x_vel(0), y_vel(0), x_acc(0), y_acc(0), mass(1), radius(1) {}
+        : x(0), y(0), x_vel(0), y_vel(0), mass(1), radius(1) {}
 
 
     //Constructor
-    Body(double x, double y, double x_vel, double y_vel, double x_acc, double y_acc, double mass, double radius)
-        : x(x), y(y), x_vel(x_vel), y_vel(y_vel), x_acc(x_acc), y_acc(y_acc), mass(mass), radius(radius) {
+    Body(double x, double y, double x_vel, double y_vel, double mass, double radius)
+        : x(x), y(y), x_vel(x_vel), y_vel(y_vel), mass(mass), radius(radius) {
             if (mass <= 0) {
                 std::cout << "Warning: Input mass is non-positive. Setting mass to 1." << std::endl;
                 this->mass = 1;
             }
-            if (radius <= 0) {
+            if (radius <= 0 && radius != -1) {
                 std::cout << "Warning: Input radius is non-positive. Setting radius to 1." << std::endl;
                 this->radius = 1;
             }
@@ -59,14 +59,6 @@ public:
 
     double getY_vel() const {
         return y_vel;
-    }
-
-    double getX_acc() const {
-        return x_acc;
-    }
-
-    double getY_acc() const {
-        return y_acc;
     }
 
     double getMass() const {
@@ -94,14 +86,6 @@ public:
         y_vel = newVelocityY;
     }
 
-    void setX_acc(double newAccelerationX) {
-        x_acc = newAccelerationX;
-    }
-
-    void setY_acc(double newAccelerationY) {
-        y_acc = newAccelerationY;
-    }
-
     void setMass(double newMass) {
         mass = newMass;
     }
@@ -110,10 +94,15 @@ public:
         radius = newRadius;
     }
 
+    //Calculate the distance between this body and another body
+    double calculateDistance(const Body& otherBody) const {
+        return std::sqrt(std::pow(otherBody.getX() - x, 2) + std::pow(otherBody.getY() - y, 2));
+    }
+
     //Calculate the force of gravity exerted from another body
     double* calculateGravityForce(const Body& otherBody) const {
         //calculate the magnitude of the force between the two bodies
-        double distance = std::sqrt(std::pow(otherBody.getX() - x, 2) + std::pow(otherBody.getY() - y, 2));
+        double distance = calculateDistance(otherBody);
         double force = -1.0*(G * mass * otherBody.getMass()) / std::pow(distance, 2);
 
         //calculate the direction of the force between the two bodies
@@ -133,23 +122,24 @@ public:
 
     //Check if this body is currently intersecting another body
     bool isIntersecting(const Body& otherBody) const {
-        double distance = std::sqrt(std::pow(otherBody.getX() - x, 2) + std::pow(otherBody.getY() - y, 2));
+        double distance = calculateDistance(otherBody);
         return distance <= (radius + otherBody.getRadius());
     }
 
     //Absorb another body into this body
     void absorb(Body& otherBody) {
         //implement absorption with another body
-        //updates mass, radius, and velocity and acceleration following
         //inelastic collision
-
-
-    }
-
-    //Calculate elastic collision with another body
-    void calculateElasticCollision(Body& otherBody) {
-    //implement elastic collision
-
+        //update the velocity by conservation of momentum
+        x_vel = (mass * x_vel + otherBody.getMass() * otherBody.getX_vel()) / (mass + otherBody.getMass());
+        y_vel = (mass * y_vel + otherBody.getMass() * otherBody.getY_vel()) / (mass + otherBody.getMass());
+        //update the mass by adding the mass of the other body
+        mass += otherBody.getMass();
+        //update the radius by r1^3 + r2^3 = (r_final)^3
+        radius = std::cbrt(std::pow(radius, 3) + std::pow(otherBody.getRadius(), 3));
+        // erase the other body, setting its mass and radius to 0
+        otherBody.setMass(0);
+        otherBody.setRadius(0);
     }
 };
 
